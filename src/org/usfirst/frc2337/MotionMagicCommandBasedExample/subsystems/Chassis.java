@@ -18,16 +18,21 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 public class Chassis extends Subsystem {
 
     private final CANTalon cANTalonFrontRight = RobotMap.chassisCANTalonFrontRight;
+    //private final CANTalon cANTalonMiddleRight = RobotMap.chassisCANTalonMiddleRight;
+    //private final CANTalon cANTalonRearRight = RobotMap.chassisCANTalonRearRight;
     private final CANTalon cANTalonFrontLeft = RobotMap.chassisCANTalonFrontLeft;
-    private final RobotDrive robotDrive = RobotMap.chassisRobotDrive21;
+    //private final CANTalon cANTalonMiddleLeft = RobotMap.chassisCANTalonMiddleLeft;
+    //private final CANTalon cANTalonRearLeft = RobotMap.chassisCANTalonRearLeft;
+   
+    private final RobotDrive robotDrive = RobotMap.chassisRobotDrive;
 
-	private final AHRS gyro	= RobotMap.chassisPID_gyro;
+	private final AHRS gyro	= RobotMap.gyro;
 	
     // Put methods for controlling this subsystem
     // here. Call these from Commands.
 
     public void initDefaultCommand() {
-    	setDefaultCommand(new DriveNerdy());
+    	setDefaultCommand(new ArcadeDrive());
 
 
         // Set the default command for a subsystem here.
@@ -46,6 +51,20 @@ public class Chassis extends Subsystem {
 	 */
 	public void arcadeDrive(double speedValue, double turnValue) {
 		robotDrive.arcadeDrive(speedValue, turnValue, true);
+	}
+	
+	public void stopMotors() {
+		robotDrive.stopMotor();  //errors???
+	}
+	
+	public void setVBus() {
+		cANTalonFrontRight.changeControlMode(TalonControlMode.PercentVbus);
+		cANTalonFrontLeft.changeControlMode(TalonControlMode.PercentVbus);
+	}
+	
+	public void setMotionMagic() {
+		cANTalonFrontRight.changeControlMode(TalonControlMode.MotionMagic);
+		cANTalonFrontLeft.changeControlMode(TalonControlMode.MotionMagic);
 	}
 	
 	/**
@@ -73,9 +92,15 @@ public class Chassis extends Subsystem {
     	return gyro.getYaw();
     }
 	
-	public void stopMotors() {
-		robotDrive.stopMotor();
+	public void resetDriveEncoder() {
+		cANTalonFrontRight.setEncPosition(0);
+		cANTalonFrontLeft.setEncPosition(0);
 	}
+
+	public int readLeftEncoder() {
+		// return (leftEncoder.get());
+		return cANTalonFrontLeft.getEncPosition();
+    }
     
 }
 

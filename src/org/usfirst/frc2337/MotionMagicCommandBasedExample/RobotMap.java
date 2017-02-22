@@ -2,6 +2,7 @@ package org.usfirst.frc2337.MotionMagicCommandBasedExample;
 
 import com.ctre.CANTalon;
 import com.ctre.CANTalon.FeedbackDevice;
+import com.ctre.CANTalon.TalonControlMode;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -19,10 +20,15 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 public class RobotMap {
 
     public static CANTalon chassisCANTalonFrontRight;
+    public static CANTalon chassisCANTalonMiddleRight;
+    public static CANTalon chassisCANTalonRearRight;
     public static CANTalon chassisCANTalonFrontLeft;
-    public static RobotDrive chassisRobotDrive21;
+    public static CANTalon chassisCANTalonMiddleLeft;
+    public static CANTalon chassisCANTalonRearLeft;
     
-    public static AHRS chassisPID_gyro;
+    public static RobotDrive chassisRobotDrive;
+    
+    public static AHRS gyro;
     
     public static StringBuilder _sb;
 
@@ -36,6 +42,8 @@ public class RobotMap {
 		/* first choose the sensor */
         chassisCANTalonFrontRight.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Relative);
         chassisCANTalonFrontRight.reverseSensor(true);
+        chassisCANTalonFrontRight.setEncPosition(0);
+        chassisCANTalonFrontRight.reverseOutput(false);
 		// chassisCANTalonFrontRight.configEncoderCodesPerRev(XXX), // if using
 		// FeedbackDevice.QuadEncoder
 		// chassisCANTalonFrontRight.configPotentiometerTurns(XXX), // if using
@@ -51,9 +59,19 @@ public class RobotMap {
         chassisCANTalonFrontRight.setI(0.001);
         chassisCANTalonFrontRight.setD(30);
 		/* set acceleration and vcruise velocity - see documentation */  //10.7 p.71  & p.97
+        //....setting in command/subsystem....
         //chassisCANTalonFrontRight.setMotionMagicCruiseVelocity(0);
         //chassisCANTalonFrontRight.setMotionMagicAcceleration(0);
         
+        chassisCANTalonMiddleRight = new CANTalon(3);
+        chassisCANTalonMiddleRight.changeControlMode(TalonControlMode.Follower);
+        chassisCANTalonMiddleRight.set(chassisCANTalonFrontRight.getDeviceID());
+        chassisCANTalonMiddleRight.reverseOutput(false);
+        
+        chassisCANTalonRearRight = new CANTalon(4);
+        chassisCANTalonRearRight.changeControlMode(TalonControlMode.Follower);
+        chassisCANTalonRearRight.set(chassisCANTalonFrontRight.getDeviceID());
+        chassisCANTalonRearRight.reverseOutput(false);
         
         
         chassisCANTalonFrontLeft = new CANTalon(13);
@@ -77,23 +95,34 @@ public class RobotMap {
         chassisCANTalonFrontLeft.setI(0);
         chassisCANTalonFrontLeft.setD(0);
 		/* set acceleration and vcruise velocity - see documentation */
-        chassisCANTalonFrontLeft.setMotionMagicCruiseVelocity(0);
-        chassisCANTalonFrontLeft.setMotionMagicAcceleration(0);
+        //....setting in command/subsystem....
+        //chassisCANTalonFrontLeft.setMotionMagicCruiseVelocity(0);
+        //chassisCANTalonFrontLeft.setMotionMagicAcceleration(0);
         
-        chassisRobotDrive21 = new RobotDrive(chassisCANTalonFrontRight, chassisCANTalonFrontLeft);
+        chassisCANTalonMiddleLeft = new CANTalon(14);
+        chassisCANTalonMiddleLeft.changeControlMode(TalonControlMode.Follower);
+        chassisCANTalonMiddleLeft.set(chassisCANTalonFrontLeft.getDeviceID());
+        //chassisLefttMiddleTalon.reverseOutput(true);
         
-        chassisRobotDrive21.setSafetyEnabled(true);
-        chassisRobotDrive21.setExpiration(0.1);
-        chassisRobotDrive21.setSensitivity(0.5);
-        chassisRobotDrive21.setMaxOutput(1.0);
-
-        chassisRobotDrive21.setInvertedMotor(RobotDrive.MotorType.kRearRight, true);
+        chassisCANTalonRearLeft = new CANTalon(15);
+        chassisCANTalonRearLeft.changeControlMode(TalonControlMode.Follower);
+        chassisCANTalonRearLeft.set(chassisCANTalonFrontLeft.getDeviceID());
+        //chassisLefttRearTalon.reverseOutput(true);
+        
+        chassisRobotDrive = new RobotDrive(chassisCANTalonFrontRight, chassisCANTalonFrontLeft);
+        
+        chassisRobotDrive.setSafetyEnabled(true);
+        chassisRobotDrive.setExpiration(0.1);
+        chassisRobotDrive.setSensitivity(0.5);
+        chassisRobotDrive.setMaxOutput(1.0);
+        
+        //chassisRobotDrive.setInvertedMotor(RobotDrive.MotorType.kRearRight, true);
         
         try {
             /* Communicate w/navX MXP via the MXP SPI Bus.                                     */
             /* Alternatively:  I2C.Port.kMXP, SerialPort.Port.kMXP or SerialPort.Port.kUSB     */
             /* See http://navx-mxp.kauailabs.com/guidance/selecting-an-interface/ for details. */
-        	chassisPID_gyro = new AHRS(SerialPort.Port.kMXP);
+        	gyro = new AHRS(SerialPort.Port.kMXP);
         } catch (RuntimeException ex ) {
             DriverStation.reportError("Instantiating navX-MXP failed:  " + ex.getMessage(), true);
         }

@@ -17,35 +17,30 @@ public class MotionMagic extends Command {
 
 	public MotionMagic() {
         requires(Robot.chassis);
-        targetPos = 10;
-
+        targetPos = 10; //revolutions
     }
     
     public MotionMagic(double revolutions) {
         requires(Robot.chassis);
         targetPos = revolutions;
-        
+    }
+    
+    public MotionMagic(double revolutions, double timeout) {
+        requires(Robot.chassis);
+        targetPos = revolutions;
+        setTimeout(timeout);
     }
 
     // Called just before this Command runs the first time
     protected void initialize() {
     	
-		RobotMap.chassisCANTalonFrontLeft.changeControlMode(TalonControlMode.MotionMagic);
-		RobotMap.chassisCANTalonFrontRight.changeControlMode(TalonControlMode.MotionMagic);
+    	Robot.chassis.setMotionMagic();
     	
-		/* calculate the percent motor output */
-		double motorOutput = RobotMap.chassisCANTalonFrontLeft.getOutputVoltage() / RobotMap.chassisCANTalonFrontLeft.getBusVoltage();
-		/* prepare line to print */
-		RobotMap._sb.append("\tout:");
-		RobotMap._sb.append(motorOutput);
-		RobotMap._sb.append("\tspd:");
-		RobotMap._sb.append(RobotMap.chassisCANTalonFrontLeft.getSpeed());
-		
-		
 		// IN ROBOR MAP OR INDIVIDUALLY??? XXX
 		/* set acceleration and vcruise velocity - see documentation */
 		RobotMap.chassisCANTalonFrontLeft.setMotionMagicCruiseVelocity(600);
 		RobotMap.chassisCANTalonFrontRight.setMotionMagicCruiseVelocity(600);
+		
 		RobotMap.chassisCANTalonFrontLeft.setMotionMagicAcceleration(100);
 		RobotMap.chassisCANTalonFrontRight.setMotionMagicAcceleration(100);
     	
@@ -54,6 +49,14 @@ public class MotionMagic extends Command {
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
     	
+		/* calculate the percent motor output */
+		double motorOutput = RobotMap.chassisCANTalonFrontLeft.getOutputVoltage() / RobotMap.chassisCANTalonFrontLeft.getBusVoltage();
+		/* prepare line to print */
+		RobotMap._sb.append("\tout:");
+		RobotMap._sb.append(motorOutput);
+		RobotMap._sb.append("\tspd:");
+		RobotMap._sb.append(RobotMap.chassisCANTalonFrontLeft.getSpeed());
+		    	
 		/* Motion Magic */
 		
 		RobotMap.chassisCANTalonFrontLeft.set(this.targetPos); /* Rotations in either direction */
@@ -85,9 +88,7 @@ public class MotionMagic extends Command {
 
     // Called once after isFinished returns true
     protected void end() {
-		RobotMap.chassisCANTalonFrontLeft.changeControlMode(TalonControlMode.PercentVbus);
-		RobotMap.chassisCANTalonFrontRight.changeControlMode(TalonControlMode.PercentVbus);
-    	
+		Robot.chassis.setVBus();
     }
 
     // Called when another command which requires one or more of the same

@@ -9,21 +9,12 @@ import com.ctre.CANTalon.TalonControlMode;
 /**
  *
  */
-public class DriveNerdy extends Command {
+public class ArcadeDrive extends Command {
 	
-	//final Joystick driverJoystick = Robot.oi.getJoystickDriver();
-	
-	public double speed;
-	public double Kp = 0.03;
-	public double yaw;
-	private Joystick joystickMain = Robot.oi.joystickDriver;
-	double turnOutput;
-	double leftJoystick, turnJoystick, turnReduction;
-	double absTurn, absSpeed, actualTurnMagnitude, actualTurn;
-	double maxTurnFullSpeed;
+	private Joystick joystickMain = Robot.oi.getJoystickDriver();
 	double deadband = 0.1;
 
-	public DriveNerdy() {
+    public ArcadeDrive() {
 
         requires(Robot.chassis);
 
@@ -31,31 +22,24 @@ public class DriveNerdy extends Command {
 
     // Called just before this Command runs the first time
     protected void initialize() {
-
-		/* Percent voltage mode */
+		
+    	/* Percent voltage mode */
     	RobotMap.chassisCANTalonFrontLeft.changeControlMode(TalonControlMode.PercentVbus);
     	RobotMap.chassisCANTalonFrontRight.changeControlMode(TalonControlMode.PercentVbus);
-    	
     }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
     	
-		leftJoystick = -joystickMain.getRawAxis(1);
-		turnJoystick = joystickMain.getRawAxis(4);
-		absTurn = Math.abs(turnJoystick);
-		absSpeed = Math.abs(leftJoystick);
-		
-		turnReduction = (1 - maxTurnFullSpeed) * ((absTurn - deadband) / (1 - deadband));
-    	actualTurnMagnitude = absTurn - (((absSpeed - deadband) / (1 - deadband)) * turnReduction);
-    	
-    	if (turnJoystick == 0) {
-    		actualTurn = 0;
-    	} else {
-    		actualTurn = (absTurn/turnJoystick) * actualTurnMagnitude;
-    	}
-   	
-    	Robot.chassis.arcadeDrive(leftJoystick, actualTurn);
+	
+    	//To Drive (using deadband)
+    	double leftJoystick = -joystickMain.getRawAxis(1);
+    	leftJoystick = ((Math.abs(leftJoystick) > deadband) ? leftJoystick : 0);
+	    double turnJoystick = joystickMain.getRawAxis(4);
+	    turnJoystick = ((Math.abs(turnJoystick) > deadband) ? turnJoystick : 0);
+	    
+	    Robot.chassis.arcadeDrive(leftJoystick, turnJoystick);
+    
     }
 
     // Make this return true when this Command no longer needs to run execute()
@@ -72,6 +56,3 @@ public class DriveNerdy extends Command {
     protected void interrupted() {
     }
 }
-
-
-
