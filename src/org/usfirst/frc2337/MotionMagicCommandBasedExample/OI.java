@@ -68,6 +68,7 @@ public class OI {
     	driver_GreenA.whileHeld(new MotionMagic(10));
     	driver_BumperRight.whileHeld(new MotionMagic(Robot.oi.joystickDriver.getRawAxis(1)*(-10)));
     	driver_BumperLeft.whileHeld(new DriveNerdy());
+    	driver_Start.whenPressed(new AutonomousCommand());
     	
 
 
